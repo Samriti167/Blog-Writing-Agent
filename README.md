@@ -169,7 +169,7 @@ venv\Scripts\activate
 ### Mac/Linux
 
 ```bash
-python -m venv venv
+python -m venv myvenv
 
 source venv/bin/activate
 ```
