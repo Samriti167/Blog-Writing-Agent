@@ -1,0 +1,12 @@
+# Environments
+blogvenv/
+svenv/
+env/
+__pycache__/
+
+# API Keys
+.env
+
+# Generated outputs
+*.md
+images/
