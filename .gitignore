@@ -10,6 +10,7 @@ __pycache__/
 # Generated outputs
 *.md
 images/
+!README.md
 
 # database
 blogs.db
