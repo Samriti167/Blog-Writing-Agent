@@ -161,7 +161,7 @@ cd AI-Blog-Writing-Agent
 ### Windows
 
 ```bash
-python -m venv venv
+python -m venv myvenv
 
 venv\Scripts\activate
 ```
