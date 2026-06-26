@@ -8,7 +8,9 @@ from typing import Any, Dict, List, Iterator, Tuple
 
 import pandas as pd
 import streamlit as st
+from database import get_all_blogs, create_table, save_blog
 
+create_table()
 
 from blog import app
 
@@ -87,41 +89,36 @@ with st.sidebar:
     st.divider()
     st.subheader("Past blogs")
 
-    past_files = list_past_blogs()
-    if not past_files:
-        st.caption("No saved blogs found (*.md in current folder).")
-        selected_md_file = None
+    blogs = get_all_blogs()
+    if not blogs:
+        st.caption("No saved blogs found in database.")
+        selected_blog = None
     else:
-        options: List[str] = []
-        file_by_label: Dict[str, Path] = {}
-        for p in past_files[:50]:
-            try:
-                md_text = read_md_file(p)
-                title = extract_title_from_md(md_text, p.stem)
-            except Exception:
-                title = p.stem
-            label = f"{title}  ·  {p.name}"
-            options.append(label)
-            file_by_label[label] = p
+        options = {}
+        for blog in blogs:
+            blog_id = blog[0]
+            title = blog[1]
+            created = blog[4]
+            label = f"{title}  ·  {created}"
+            options[label] = blog
 
         selected_label = st.radio(
             "Select a blog to load",
-            options=options,
+            options=list(options.keys()),
             index=0,
             label_visibility="collapsed",
         )
-        selected_md_file = file_by_label.get(selected_label)
+        selected_blog = options.get(selected_label)
 
         if st.button("📂 Load selected blog"):
-            if selected_md_file:
-                md_text = read_md_file(selected_md_file)
+            if selected_blog:
                 st.session_state["last_out"] = {
-                    "plan": None,          
-                    "evidence": [],        
-                    "final": md_text,      
+                    "plan": None,
+                    "evidence": [],
+                    "final": selected_blog[3], # Database content
                 }
-                st.session_state["topic_prefill"] = extract_title_from_md(md_text, selected_md_file.stem)
-
+                st.session_state["topic_prefill"] = selected_blog[1] # Database title
+                
 if "topic_prefill" in st.session_state and isinstance(st.session_state["topic_prefill"], str):
     pass
 
@@ -189,6 +186,24 @@ if run_btn:
         elif kind == "final":
             out = payload
             st.session_state["last_out"] = out
+            
+            # --- DATABASE INTEGRATION START ---
+            final_content = out.get("final", "")
+            plan_obj = out.get("plan")
+            
+            # Safely extract title for the database
+            blog_title = "Untitled Blog"
+            if plan_obj:
+                if hasattr(plan_obj, "blog_title"):
+                    blog_title = plan_obj.blog_title
+                elif isinstance(plan_obj, dict):
+                    blog_title = plan_obj.get("blog_title", "Untitled Blog")
+            
+            # Save silently to SQLite
+            if final_content:
+                save_blog(title=blog_title, topic=inputs["topic"], content=final_content)
+            # --- DATABASE INTEGRATION END ---
+
             status.update(label="✅ Done", state="complete", expanded=False)
             log("[final] received final state")
 
