@@ -149,9 +149,9 @@ Combines all generated sections into:
 ## Clone Repository
 
 ```bash
-git clone https://github.com/Samriti167/AI-Blog-Writing-Agent.git
+git clone https://github.com/Samriti167/Blog-Writing-Agent.git
 
-cd AI-Blog-Writing-Agent
+cd Blog-Writing-Agent
 ```
 
 ---
@@ -161,17 +161,17 @@ cd AI-Blog-Writing-Agent
 ### Windows
 
 ```bash
-python -m venv myvenv
+python -m venv bwvenv
 
-venv\Scripts\activate
+bwvenv\Scripts\activate
 ```
 
 ### Mac/Linux
 
 ```bash
-python -m venv myvenv
+python -m venv bwvenv
 
-source venv/bin/activate
+source bwvenv/bin/activate
 ```
 
 ---
